@@ -2,11 +2,11 @@ package org.scalatest.finders;
 
 class NameTransformer {
 
-  private static int nops = 128;
-  private static int ncodes = 26 * 26;
+  private static final int nops = 128;
+  private static final int ncodes = 26 * 26;
   
-  private static String[] op2code = new String[nops];
-  private static OpCodes[] code2op = new OpCodes[ncodes];
+  private static final String[] op2code = new String[nops];
+  private static final OpCodes[] code2op = new OpCodes[ncodes];
   
   static {
     /* Note: decoding assumes opcodes are only ever lowercase. */
@@ -31,9 +31,9 @@ class NameTransformer {
   }
   
   private static class OpCodes {
-    private char op;
-    private String code;
-    private OpCodes next;
+    private final char op;
+    private final String code;
+    private final OpCodes next;
     
     public OpCodes(char op, String code, OpCodes next) {
       this.op = op;
@@ -63,7 +63,7 @@ class NameTransformer {
       if (c < nops && (op2code[c] != null)) {
         if (buf == null) {
           buf = new StringBuilder();
-          buf.append(name.substring(0, i));
+          buf.append(name, 0, i);
         }
         buf.append(op2code[c]);
       /* Handle glyphs that are not valid Java/JVM identifiers */
@@ -71,7 +71,7 @@ class NameTransformer {
       else if (!Character.isJavaIdentifierPart(c)) {
         if (buf == null) {
           buf = new StringBuilder();
-          buf.append(name.substring(0, i));
+          buf.append(name, 0, i);
         }
         buf.append(String.format("$u%04X", c));
       }
@@ -111,7 +111,7 @@ class NameTransformer {
            if (ops != null) {
              if (buf == null) {
                buf = new StringBuilder();
-               buf.append(name.substring(0, i));
+               buf.append(name, 0, i);
              }
              buf.append(ops.op);
              i += ops.code.length();
@@ -128,7 +128,7 @@ class NameTransformer {
              char str = (char) Integer.parseInt(hex, 16);
              if (buf == null) {
                buf = new StringBuilder();
-               buf.append(name.substring(0, i));
+               buf.append(name, 0, i);
              }
              buf.append(str);
              /* 2 for "$u", 4 for hexadecimal number */

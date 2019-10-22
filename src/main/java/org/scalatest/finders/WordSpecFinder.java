@@ -20,10 +20,10 @@ import java.util.*;
 
 public class WordSpecFinder implements Finder {
     
-  private Set<String> scopeSet;
+  private final Set<String> scopeSet;
     
   public WordSpecFinder() {
-    scopeSet = new HashSet<String>();
+    scopeSet = new HashSet<>();
     scopeSet.add("should");
     scopeSet.add("must");
     scopeSet.add("can");
@@ -33,7 +33,7 @@ public class WordSpecFinder implements Finder {
   }
   
   private String getTestNameBottomUp(MethodInvocation invocation) {
-    String result = "";
+    StringBuilder result = new StringBuilder();
     while (invocation != null) {
       MethodInvocation nameInvocation = invocation;
       if (invocation.target().name().equals("taggedAs") && invocation.target() instanceof MethodInvocation) {
@@ -41,15 +41,16 @@ public class WordSpecFinder implements Finder {
       }
       if (!nameInvocation.target().canBePartOfTestName() || (!invocation.name().equals("in") && invocation.canBePartOfTestName()))
         return null;
-      String targetText = (nameInvocation.name().equals("in") || nameInvocation.name().equals("taggedAs")) ? nameInvocation.target().toString() :
-              (nameInvocation.target().toString() + " " + nameInvocation.name());
-      result = targetText + " " + result;
+      String targetText = (nameInvocation.name().equals("in") || nameInvocation.name().equals("taggedAs"))
+          ? nameInvocation.target().toString()
+          : (nameInvocation.target().toString() + " " + nameInvocation.name());
+      result.insert(0, targetText + " ");
       if (invocation.parent() != null && invocation.parent() instanceof MethodInvocation)
         invocation = (MethodInvocation) invocation.parent();
       else
         invocation = null;
     }
-    return result.trim();      
+    return result.toString().trim();
   }
   
   private String getDisplayNameBottomUp(MethodInvocation invocation) {
@@ -60,8 +61,8 @@ public class WordSpecFinder implements Finder {
   }
   
   private List<String> getTestNamesTopDown(MethodInvocation invocation) {
-    List<String> results = new ArrayList<String>();
-    List<AstNode> nodes = new ArrayList<AstNode>();
+    List<String> results = new ArrayList<>();
+    List<AstNode> nodes = new ArrayList<>();
     nodes.add(invocation);
         
     while (nodes.size() > 0) {
@@ -101,7 +102,7 @@ public class WordSpecFinder implements Finder {
         else if (scopeSet.contains(name)) {
           String displayName = getDisplayNameBottomUp(invocation);
           List<String> testNames = getTestNamesTopDown(invocation);
-          result = new Selection(invocation.className(), displayName, testNames.toArray(new String[testNames.size()]));
+          result = new Selection(invocation.className(), displayName, testNames.toArray(new String[0]));
         }
       }
         

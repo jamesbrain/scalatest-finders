@@ -17,19 +17,21 @@
 package org.scalatest.finders
 
 import org.scalatest.FunSuite
-import org.scalatest.Suite
-import org.scalatest.FeatureSpec
-import org.scalatest.FreeSpec
-import org.scalatest.FlatSpec
-import org.scalatest.PropSpec
+import org.scalatest.Matchers._
 
 trait FinderSuite extends FunSuite {
-  
+
   def expectSelection(selection: Selection, expectedClassName: String, expectedDisplayName: String, expectedTestNames: Array[String]) {
-    assert(selection != null, "Test is null, expected className=" + expectedClassName + ", displayName=" + expectedDisplayName + ", testNames=" + expectedTestNames.deep.toString)
-    expect(expectedClassName)(selection.className)
-    expect(expectedDisplayName)(selection.displayName)
-    expect(expectedTestNames.deep.toString)(selection.testNames.deep.toString)
+    assert(
+      selection != null,
+      "Test is null, " +
+        s"expected className=$expectedClassName, " +
+        s"displayName=$expectedDisplayName, " +
+        s"testNames=${expectedTestNames.deep.toString}"
+    )
+    selection.className shouldBe expectedClassName
+    selection.displayName shouldBe expectedDisplayName
+    selection.testNames should contain theSameElementsAs expectedTestNames.deep
   }
-  
+
 }

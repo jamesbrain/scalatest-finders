@@ -36,7 +36,7 @@ public class LocationUtils {
         break;
       }
     }
-    List<Finder> finderList = new ArrayList<Finder>();
+    List<Finder> finderList = new ArrayList<>();
     if (findersAnnotation != null) {
       Method valueMethod = findersAnnotation.annotationType().getMethod("value");
       String[] finderClassNames = (String[]) valueMethod.invoke(findersAnnotation);
@@ -52,8 +52,8 @@ public class LocationUtils {
   }
   
   private static List<Finder> lookInSuperClasses(Class<?> clazz) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, InstantiationException {
-    Class<?> superClass = null;
-    List<Finder> finders = new ArrayList<Finder>();
+    Class<?> superClass;
+    List<Finder> finders = new ArrayList<>();
     while(finders.size() == 0 && (superClass = clazz.getSuperclass()) != null) {
       finders = getFinderInstances(superClass);
       clazz = superClass;
@@ -62,9 +62,9 @@ public class LocationUtils {
   }
   
   private static List<Finder> lookInInterfaces(Class<?>[] interfaces) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, InstantiationException {
-    List<Finder> finders = new ArrayList<Finder>();
+    List<Finder> finders = new ArrayList<>();
     while(finders.size() == 0 && interfaces.length != 0) {
-      List<Class<?>> newInterfaces = new ArrayList<Class<?>>();
+      List<Class<?>> newInterfaces = new ArrayList<>();
       for (Class<?> itf : interfaces) {
         finders = getFinderInstances(itf);
         if (finders.size() == 0)
@@ -72,7 +72,7 @@ public class LocationUtils {
         else
           break;
       }
-      interfaces = newInterfaces.toArray(new Class<?>[newInterfaces.size()]);
+      interfaces = newInterfaces.toArray(new Class<?>[0]);
     }
     return finders;
   }

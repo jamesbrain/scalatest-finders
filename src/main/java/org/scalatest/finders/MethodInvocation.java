@@ -21,12 +21,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MethodInvocation implements AstNode {
-  private String className;
-  private AstNode target;
-  private AstNode parent;
-  private List<AstNode> children;
-  private String name;
-  private AstNode[] args;
+  private final String className;
+  private final AstNode target;
+  private final AstNode parent;
+  private final List<AstNode> children;
+  private final String name;
+  private final AstNode[] args;
   
   public MethodInvocation(String className, AstNode target, AstNode parent, AstNode[] children, String name, AstNode... args) {
     this.className = className;
@@ -34,7 +34,7 @@ public class MethodInvocation implements AstNode {
     this.parent = parent;
     if (parent != null)
       parent.addChild(this);
-    this.children = new ArrayList<AstNode>();
+    this.children = new ArrayList<>();
     this.children.addAll(Arrays.asList(children));
     this.name = name;
     this.args = args;
@@ -49,7 +49,7 @@ public class MethodInvocation implements AstNode {
   }
   
   public AstNode[] children() {
-    return children.toArray(new AstNode[children.size()]);
+    return children.toArray(new AstNode[0]);
   }
   
   public String name() {

@@ -58,7 +58,7 @@ public class FeatureSpecFinder implements Finder {
           AstNode parent = invocation.parent();
           if (parent instanceof ConstructorBlock) {
             String featureText = "Feature: " + args[0];
-            List<String> testNameList = new ArrayList<String>();
+            List<String> testNameList = new ArrayList<>();
             AstNode[] children = invocation.children();
             for (AstNode childNode : children) {
               if (childNode instanceof MethodInvocation
@@ -71,7 +71,7 @@ public class FeatureSpecFinder implements Finder {
                   }
               }
             }
-            result = new Selection(invocation.className(), featureText, testNameList.toArray(new String[testNameList.size()]));
+            result = new Selection(invocation.className(), featureText, testNameList.toArray(new String[0]));
           }
           else {
             if (node.parent() != null) 

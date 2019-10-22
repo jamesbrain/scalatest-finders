@@ -22,17 +22,17 @@ import java.util.List;
 
 public class ToStringTarget implements AstNode {
     
-  private String className;
-  private AstNode parent;
-  private List<AstNode> children;
-  private Object target;
+  private final String className;
+  private final AstNode parent;
+  private final List<AstNode> children;
+  private final Object target;
     
   public ToStringTarget(String className, AstNode parent, AstNode[] children, Object target) {
     this.className = className;
     this.parent = parent;
     if (parent != null)
         parent.addChild(this);
-    this.children = new ArrayList<AstNode>();
+    this.children = new ArrayList<>();
     this.children.addAll(Arrays.asList(children));
     this.target = target;
   }

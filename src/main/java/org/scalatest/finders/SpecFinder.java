@@ -22,13 +22,13 @@ import java.util.List;
 public class SpecFinder implements Finder {
     
   private String getTestNameBottomUp(AstNode node) {
-    String result = "";
+    StringBuilder result = new StringBuilder();
     if (node instanceof MethodDefinition || node instanceof ModuleDefinition && node.canBePartOfTestName()) {
-      result = node.name();
+      result = new StringBuilder(node.name());
       node = node.parent();
       while (node != null) {
         if (node instanceof ModuleDefinition && node.canBePartOfTestName()) {
-          result = ((ModuleDefinition) node).name() + " " + result;
+          result.insert(0, node.name() + " ");
           node = node.parent();
         }
         else if (node instanceof ConstructorBlock) {
@@ -39,29 +39,29 @@ public class SpecFinder implements Finder {
             node = null;
           else {
             // Nested class will not be recognized.
-            result = "";
+            result = new StringBuilder();
             node = null;
           }
         }
         else {
-          result = "";
+          result = new StringBuilder();
           node = null;
         }
       }
     }
-    return result;
+    return result.toString();
   }
   
   private List<String> getTestNamesTopDown(AstNode node) {
-    List<String> results = new ArrayList<String>();
-    List<AstNode> nodes = new ArrayList<AstNode>();
+    List<String> results = new ArrayList<>();
+    List<AstNode> nodes = new ArrayList<>();
     nodes.add(node);
     
     while (nodes.size() > 0) {
       AstNode head = nodes.remove(0);
       if (head instanceof MethodDefinition) {
         MethodDefinition methodDef = (MethodDefinition) head;
-        if (methodDef.name().indexOf(" ") >= 0) {
+        if (methodDef.name().contains(" ")) {
           String testName = getTestNameBottomUp(methodDef);
           if (testName.length() > 0)
             results.add(testName);
@@ -77,14 +77,14 @@ public class SpecFinder implements Finder {
   public Selection find(AstNode node) {
     Selection result = null;
     while (result == null) {
-      if (node instanceof MethodDefinition && node.name().indexOf(" ") >= 0) {
+      if (node instanceof MethodDefinition && node.name().contains(" ")) {
         String testName = getTestNameBottomUp(node);
         result = new Selection(node.className(), testName, new String[] { testName });
       }
-      else if (node instanceof ModuleDefinition && node.name().indexOf(" ") >= 0) {
+      else if (node instanceof ModuleDefinition && node.name().contains(" ")) {
         String displayName = getTestNameBottomUp(node);
         List<String> testNames = getTestNamesTopDown(node);
-        result = new Selection(node.className(), displayName, testNames.toArray(new String[testNames.size()]));
+        result = new Selection(node.className(), displayName, testNames.toArray(new String[0]));
       }
       else {
         if (node.parent() != null) 

@@ -18,9 +18,9 @@ package org.scalatest.finders;
 
 public class StringLiteral implements AstNode {
   
-  private String className;
-  private AstNode parent;
-  private String value;
+  private final String className;
+  private final AstNode parent;
+  private final String value;
     
   public StringLiteral(String className, AstNode parent, String value) {
     this.className = className;
@@ -61,7 +61,7 @@ public class StringLiteral implements AstNode {
   
   @Override
   public String toString() {
-    return value.toString();
+    return value;
   }
 }
 

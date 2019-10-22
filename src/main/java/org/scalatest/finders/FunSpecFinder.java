@@ -39,7 +39,7 @@ public class FunSpecFinder implements Finder {
       }
       
       if (node.parent() != null && node.parent() instanceof MethodInvocation)
-        node = (MethodInvocation) node.parent();
+        node = node.parent();
       else
         node = null;
     }
@@ -47,8 +47,8 @@ public class FunSpecFinder implements Finder {
   }
   
   private List<String> getTestNamesTopDown(MethodInvocation invocation) {
-    List<String> results = new ArrayList<String>();
-    List<AstNode> nodes = new ArrayList<AstNode>();
+    List<String> results = new ArrayList<>();
+    List<AstNode> nodes = new ArrayList<>();
     nodes.add(invocation);
     
     while (nodes.size() > 0) {
@@ -87,7 +87,7 @@ public class FunSpecFinder implements Finder {
         else if (name.equals("describe")) {
           String displayName = getTestNameBottomUp(invocation);
           List<String> testNames = getTestNamesTopDown(invocation);
-          result = new Selection(invocation.className(), displayName, testNames.toArray(new String[testNames.size()]));
+          result = new Selection(invocation.className(), displayName, testNames.toArray(new String[0]));
         }
         else {
           if (node.parent() != null) 

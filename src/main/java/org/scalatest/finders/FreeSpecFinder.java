@@ -23,27 +23,27 @@ import java.util.List;
 public class FreeSpecFinder implements Finder {
   
   private String getTestNameBottomUp(MethodInvocation invocation) {
-    String result = "";
+    StringBuilder result = new StringBuilder();
     while (invocation != null) {
       if (invocation.target().name().equals("taggedAs") && invocation.target() instanceof MethodInvocation) {
         MethodInvocation taggedInvocation = (MethodInvocation) invocation.target();
         if (!taggedInvocation.target().canBePartOfTestName()) return null;
-        result = taggedInvocation.target().toString() + " " + result;
+        result.insert(0, taggedInvocation.target().toString() + " ");
       } else {
         if (!invocation.target().canBePartOfTestName()) return null;
-        result = invocation.target().toString() + " " + result;
+        result.insert(0, invocation.target().toString() + " ");
       }
       if (invocation.parent() != null && invocation.parent() instanceof MethodInvocation)
         invocation = (MethodInvocation) invocation.parent();
       else
         invocation = null;
     }
-    return result.trim();      
+    return result.toString().trim();
   }
    
   private List<String> getTestNamesTopDown(MethodInvocation invocation) {
-    List<String> results = new ArrayList<String>();
-    List<AstNode> nodes = new ArrayList<AstNode>();
+    List<String> results = new ArrayList<>();
+    List<AstNode> nodes = new ArrayList<>();
     nodes.add(invocation);
       
     while (nodes.size() > 0) {
@@ -83,7 +83,7 @@ public class FreeSpecFinder implements Finder {
         else if (name.equals("-")) {
           String displayName = getTestNameBottomUp(invocation);
           List<String> testNames = getTestNamesTopDown(invocation);
-          result = new Selection(invocation.className(), displayName, testNames.toArray(new String[testNames.size()]));
+          result = new Selection(invocation.className(), displayName, testNames.toArray(new String[0]));
         }
       }
         

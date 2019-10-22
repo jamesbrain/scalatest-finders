@@ -54,7 +54,7 @@ public class FlatSpecFinder implements Finder {
     
   private Selection getAllTestSelection(String className, AstNode[] constructorChildren) {
     String prefix = null;
-    List<String> testNames = new ArrayList<String>();
+    List<String> testNames = new ArrayList<>();
     for (AstNode child : constructorChildren) {
       if (isScope(child))
         prefix = getPrefix((MethodInvocation) child);
@@ -65,7 +65,7 @@ public class FlatSpecFinder implements Finder {
         }
       }
     }
-    return new Selection(className, className, testNames.toArray(new String[testNames.size()]));
+    return new Selection(className, className, testNames.toArray(new String[0]));
   }
     
   private String getPrefix(MethodInvocation invocation) {
@@ -109,7 +109,7 @@ public class FlatSpecFinder implements Finder {
       if (isScope(topLevelNode))
         return topLevelNode;
       else {
-        List<AstNode> beforeTopLevelNodeList = new ArrayList<AstNode>();
+        List<AstNode> beforeTopLevelNodeList = new ArrayList<>();
         for (AstNode child : constructorChildren) {
           if (!child.equals(topLevelNode)) 
             beforeTopLevelNodeList.add(child);
@@ -161,7 +161,12 @@ public class FlatSpecFinder implements Finder {
 
   private boolean isScopeShould(MethodInvocation invocation, boolean allowIt) {
     return (invocation.name().equals("should") || invocation.name().equals("must")) && invocation.args().length > 0 &&
-            invocation.target() != null && (allowIt || !invocation.target().name().equals("it"));
+            invocation.target() != null && (allowIt || !isItOrThey(invocation));
+  }
+
+  private boolean isItOrThey(MethodInvocation invocation) {
+    String name = invocation.target().name();
+    return name.equals("it") || name.equals("they");
   }
     
   private Selection getNodeTestSelection(AstNode node, String prefix, AstNode[] constructorChildren) {
@@ -170,53 +175,51 @@ public class FlatSpecFinder implements Finder {
     }
     if (node instanceof ConstructorBlock) {
       List<String> testNames = getTestNamesFromChildren(prefix, Arrays.asList(node.children()));
-      return new Selection(node.className(), prefix.length() > 0 ? prefix : node.className(), testNames.toArray(new String[testNames.size()]));
+      return new Selection(node.className(), prefix.length() > 0 ? prefix : node.className(), testNames.toArray(new String[0]));
     }
     else if (node instanceof MethodInvocation) {
       MethodInvocation invocation = (MethodInvocation) node;
       String name = invocation.name();
-      if (name.equals("of")) {
-        List<AstNode> constructorChildrenList = Arrays.asList(constructorChildren);
-        int nodeIdx = constructorChildrenList.indexOf(node);
-        if (nodeIdx >= 0) {
-          List<AstNode> startList = constructorChildrenList.subList(nodeIdx + 1, constructorChildrenList.size());
-          List<AstNode> subList = new ArrayList<AstNode>();
-          for (AstNode snode : startList) {
-            if (!isScope(snode)) 
-              subList.add(snode);
-            else
-              break;
-          }
-          List<String> testNames = getTestNamesFromChildren(prefix, subList);
-          return new Selection(node.className(), prefix, testNames.toArray(new String[testNames.size()]));
-        }
-        else
+      switch (name) {
+        case "of":
+          List<AstNode> constructorChildrenList = Arrays.asList(constructorChildren);
+          int nodeIdx = constructorChildrenList.indexOf(node);
+          if (nodeIdx >= 0) {
+            List<AstNode> startList = constructorChildrenList.subList(nodeIdx + 1, constructorChildrenList.size());
+            List<AstNode> subList = new ArrayList<>();
+            for (AstNode snode : startList) {
+              if (!isScope(snode))
+                subList.add(snode);
+              else
+                break;
+            }
+            List<String> testNames = getTestNamesFromChildren(prefix, subList);
+            return new Selection(node.className(), prefix, testNames.toArray(new String[0]));
+          } else
+            return null;
+        case "should":
+        case "must":
+          AstNode parent = invocation.parent();
+          if (parent instanceof MethodInvocation && parent.name().equals("in")) {
+            String testName = getTestName(prefix, (MethodInvocation) parent);
+            return testName != null ? new Selection(invocation.className(), testName, new String[]{testName}) : null;
+          } else
+            return null;
+        case "in":
+          String testName = getTestName(prefix, invocation);
+          return testName != null ? new Selection(invocation.className(), testName, new String[]{testName}) : null;
+        default:
           return null;
       }
-      else if (name.equals("should") || name.equals("must")) {
-        AstNode parent = invocation.parent();
-        if (parent instanceof MethodInvocation && parent.name().equals("in")) {
-          String testName = getTestName(prefix, (MethodInvocation) parent);
-          return testName != null ? new Selection(invocation.className(), testName, new String[] { testName }) : null;
-        }
-        else
-          return null;
-      }
-      else if (name.equals("in")) {
-        String testName = getTestName(prefix, invocation);
-        return testName != null ? new Selection(invocation.className(), testName, new String[] { testName }) : null;
-      }
-      else 
-        return null;
     }
     else 
       return null;
   }
     
   private List<String> getTestNamesFromChildren(String prefix, List<AstNode> children) {
-    Set<String> validSet = new HashSet<String>();
+    Set<String> validSet = new HashSet<>();
     validSet.add("in");
-    List<String> testNameList = new ArrayList<String>();
+    List<String> testNameList = new ArrayList<>();
     for (AstNode node : children) {
       if (node instanceof MethodInvocation && isValidName(node.name(), validSet)) {
         MethodInvocation invocation = (MethodInvocation) node;

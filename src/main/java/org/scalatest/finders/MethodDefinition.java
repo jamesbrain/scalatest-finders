@@ -22,18 +22,18 @@ import java.util.List;
 
 public class MethodDefinition implements AstNode {
   
-  private String className;
-  private AstNode parent;
-  private List<AstNode> children;
-  private String name;
-  private String[] paramTypes;
+  private final String className;
+  private final AstNode parent;
+  private final List<AstNode> children;
+  private final String name;
+  private final String[] paramTypes;
     
   public MethodDefinition(String className, AstNode parent, AstNode[] children, String name, String... paramTypes) {
     this.className = className;
     this.parent = parent;
     if (parent != null)
       parent.addChild(this);
-    this.children = new ArrayList<AstNode>();
+    this.children = new ArrayList<>();
     this.children.addAll(Arrays.asList(children));
     this.name = name;
     this.paramTypes = paramTypes;
@@ -48,7 +48,7 @@ public class MethodDefinition implements AstNode {
   }
   
   public AstNode[] children() {
-    return children.toArray(new AstNode[children.size()]);
+    return children.toArray(new AstNode[0]);
   }
   
   public String name() {

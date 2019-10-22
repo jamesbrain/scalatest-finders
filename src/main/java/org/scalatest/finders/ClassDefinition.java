@@ -6,18 +6,18 @@ import java.util.List;
 
 public class ClassDefinition implements AstNode {
 
-  private String className;
-  private AstNode parent;
-  private List<AstNode> children;
-  private String name;
-  private String[] paramTypes;
+  private final String className;
+  private final AstNode parent;
+  private final List<AstNode> children;
+  private final String name;
+  private final String[] paramTypes;
   
   public ClassDefinition(String className, AstNode parent, AstNode[] childrenArr, String name, String... paramTypes) {
     this.className = className;
     this.parent = parent;
     if (parent != null)
       parent.addChild(this);
-    children = new ArrayList<AstNode>();
+    children = new ArrayList<>();
     children.addAll(Arrays.asList(childrenArr));
     this.name = name;
     this.paramTypes = paramTypes;
@@ -32,7 +32,7 @@ public class ClassDefinition implements AstNode {
   }
     
   public AstNode[] children() {
-    return children.toArray(new AstNode[children.size()]);
+    return children.toArray(new AstNode[0]);
   }
     
   public String name() {
